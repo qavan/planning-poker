@@ -52,8 +52,11 @@ router.post("/create", auth, async (req, res) => {
       owner: userId,
       teamName,
       teamPass: password,
-      users: [userId]
+      users: [],
+      status: "waiting"
     };
+
+    appState.teams[teamId].users.push(userId);
 
     res.status(200).json({ message: "Команда создана!" });
   } catch (error) {

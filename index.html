@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const ws = new WebSocket("ws://localhost:3001", 1);
+      ws.onopen = async () => {
+        await ws.send(
+          JSON.stringify({
+            method: "SET_USER_ID",
+            id: "5e66702a2683d514f4dc08b7"
+          })
+        );
+        await ws.send(
+          JSON.stringify({
+            method: "START_VOTING",
+            teamId: "vGT3AMK-",
+            userId: "5e66702a2683d514f4dc08b7"
+          })
+        );
+      };
+
+      ws.onmessage = data => {
+        try {
+          console.log(JSON.parse(data, true));
+        } catch (error) {
+          console.log(data);
+        }
+      };
+    </script>
+  </body>
+</html>
