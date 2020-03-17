@@ -45,29 +45,72 @@ server.on("connection", ws => {
         break;
       case "START_VOTING":
         const { teamId, userId } = jsonData;
-        if (
-          appState.teams[teamId].owner == userId &&
-          appState.teams[teamId].status != "voting"
-        ) {
-          appState.teams[teamId].status = "voting";
-          server.clients.forEach(wsc => {
-            if (
-              appState.teams[teamId].users.indexOf(wsc.userId) !== -1 ||
-              appState.teams[teamId].owner == wsc.userId
-            ) {
-              wsc.send(
-                JSON.stringify({
-                  status: "voting"
-                  //TODO: send current state
-                })
-              );
+        if (appState.teams[teamId].owner == userId) {
+          //проверка на лидера команды
+          if (appState.teams[teamId].status != "voting") {
+            //проверка на текущий статус
+            appState.teams[teamId].status = "voting"; //устанавливаем статус
+            for (let index in appState.teams[teamId].results) {
+              appState.teams[teamId].results[index].value = null; //обнуляем результаты прошлого голосования, если есть
             }
-          });
+            server.clients.forEach(wsc => {
+              //уведомляем пользователей
+              if (
+                appState.teams[teamId].users.indexOf(wsc.userId) !== -1 ||
+                appState.teams[teamId].owner == wsc.userId
+              ) {
+                wsc.send(
+                  JSON.stringify({
+                    status: "voting"
+                    //TODO: send current state
+                  })
+                );
+              }
+            });
+          }
         }
         break;
       case "STOP_VOTING":
+        const { teamId, userId } = jsonData;
+        if (appState.teams[teamId].owner == userId) {
+          if (appState.teams[teamId].status != "end") {
+            appState.teams[teamId].status = "end";
+            server.clients.forEach(wsc => {
+              if (
+                appState.teams[teamId].users.indexOf(wsc.userId) !== -1 ||
+                appState.teams[teamId].owner == wsc.userId
+              ) {
+                wsc.send(
+                  JSON.stringify({
+                    status: "end"
+                    //TODO: save to db
+                  })
+                );
+              }
+            });
+          }
+        }
         break;
       case "SET_VOTE_VALUE":
+        const { teamId, userId, voteValue } = jsonData;
+        if (appState.teams[teamId].status != "end") {
+          if (!appState.teams[teamId].results[userId]) {
+            appState.teams[teamId].results[userId] = voteValue;
+            server.clients.forEach(wsc => {
+              if (
+                appState.teams[teamId].users.indexOf(wsc.userId) !== -1 ||
+                appState.teams[teamId].owner == wsc.userId
+              ) {
+                wsc.send(
+                  JSON.stringify({
+                    status: "voting"
+                    //TODO: send current state
+                  })
+                );
+              }
+            });
+          }
+        }
         break;
     }
     server.clients.forEach(wsc => {
