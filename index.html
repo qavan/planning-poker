@@ -6,31 +6,90 @@
     <title>Document</title>
   </head>
   <body>
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
+    ></script>
+    <p>Connection state: <span id="connState"></span></p>
+    <pre id="state">
+      empty
+    </pre>
+    <button id="connect">Присоединиться</button>
+    <button id="start">Начать голосование</button>
+    <button id="setVote">Проголосовать</button>
+    <button id="stop">Завершить голосование</button>
     <script>
-      const ws = new WebSocket("ws://localhost:3001", 1);
-      ws.onopen = async () => {
-        await ws.send(
-          JSON.stringify({
-            method: "SET_USER_ID",
-            id: "5e66702a2683d514f4dc08b7"
-          })
-        );
-        await ws.send(
+      let ws;
+      let userId = "5e66702a2683d514f4dc08b8";
+      let teamId = "md3R_zzF";
+
+      $("#connect").click(() => {
+        ws = new WebSocket("ws://localhost:3001", 1);
+        ws.onopen = async () => {
+          $("#connState").html("Online");
+          await ws.send(
+            JSON.stringify(
+              {
+                method: "SET_USER_ID",
+                id: "5e66702a2683d514f4dc08b8"
+              },
+              true
+            )
+          );
+        };
+        ws.onmessage = data => {
+          try {
+            console.log(data);
+            console.log(JSON.parse(data.data), true);
+            $("#state").html(data);
+          } catch (error) {
+            $("#state").html(error);
+          }
+        };
+        ws.onclose = () => {
+          $("#connState").html("Offline");
+        };
+      });
+
+      $("#start").click(() => {
+        ws.send(
           JSON.stringify({
             method: "START_VOTING",
-            teamId: "vGT3AMK-",
-            userId: "5e66702a2683d514f4dc08b7"
+            userId: "5e66702a2683d514f4dc08b8",
+            teamId: "6ZjbeF5u"
           })
         );
-      };
+      });
 
-      ws.onmessage = data => {
-        try {
-          console.log(JSON.parse(data, true));
-        } catch (error) {
-          console.log(data);
-        }
-      };
+      $("#setVote").click(() => {
+        ws.send(
+          JSON.stringify({
+            method: "SET_VOTE_VALUE",
+            userId: "5e66702a2683d514f4dc08b8",
+            teamId: "6ZjbeF5u",
+            voteValue: 3
+          })
+        );
+      });
+
+      $("#stop").click(() => {
+        ws.send(
+          JSON.stringify({
+            method: "STOP_VOTING",
+            userId: "5e66702a2683d514f4dc08b8",
+            teamId: "6ZjbeF5u"
+          })
+        );
+      });
+
+      // ws.onmessage = data => {
+      //   try {
+      //     console.log(JSON.parse(data, true));
+      //   } catch (error) {
+      //     console.log(data);
+      //   }
+      // };
     </script>
   </body>
 </html>
