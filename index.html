@@ -21,7 +21,7 @@
     <button id="stop">Завершить голосование</button>
     <script>
       let ws;
-      let userId = "5e66702a2683d514f4dc08b8";
+      let userId = "5e66702a2683d514f4dc08b7";
       let teamId = "md3R_zzF";
 
       $("#connect").click(() => {
@@ -32,7 +32,7 @@
             JSON.stringify(
               {
                 method: "SET_USER_ID",
-                id: "5e66702a2683d514f4dc08b8"
+                id: "5e66702a2683d514f4dc08b7"
               },
               true
             )
@@ -56,8 +56,8 @@
         ws.send(
           JSON.stringify({
             method: "START_VOTING",
-            userId: "5e66702a2683d514f4dc08b8",
-            teamId: "6ZjbeF5u"
+            userId: "5e66702a2683d514f4dc08b7",
+            teamId: "EgPleykkJ"
           })
         );
       });
@@ -66,8 +66,8 @@
         ws.send(
           JSON.stringify({
             method: "SET_VOTE_VALUE",
-            userId: "5e66702a2683d514f4dc08b8",
-            teamId: "6ZjbeF5u",
+            userId: "5e66702a2683d514f4dc08b7",
+            teamId: "EgPleykkJ",
             voteValue: 3
           })
         );
@@ -77,8 +77,8 @@
         ws.send(
           JSON.stringify({
             method: "STOP_VOTING",
-            userId: "5e66702a2683d514f4dc08b8",
-            teamId: "6ZjbeF5u"
+            userId: "5e66702a2683d514f4dc08b7",
+            teamId: "EgPleykkJ"
           })
         );
       });
