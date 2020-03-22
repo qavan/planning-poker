@@ -28,9 +28,8 @@ async function start() {
   }
 }
 
-//TOOD: disconnect not authenticated users
 //TOOD: connect only on "waiting" phase
 //TOOD: catch errors
-//TODO: put combine results to another function
+//TODO: only leader can see actual state
 
 start();
