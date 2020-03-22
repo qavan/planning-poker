@@ -6,7 +6,8 @@ const router = Router();
 // /api/user/name
 router.post("/name", auth, async (req, res) => {
   try {
-    const { userName, userId } = req.body;
+    const { userName } = req.body;
+    const userId = req.userId;
     const user = await User.findById(userId);
 
     if (!user) {

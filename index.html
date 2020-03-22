@@ -21,18 +21,18 @@
     <button id="stop">Завершить голосование</button>
     <script>
       let ws;
-      let userId = "5e66702a2683d514f4dc08b7";
-      let teamId = "md3R_zzF";
 
       $("#connect").click(() => {
-        ws = new WebSocket("ws://localhost:3001", 1);
+        ws = new WebSocket("ws://localhost:3001");
         ws.onopen = async () => {
           $("#connState").html("Online");
           await ws.send(
             JSON.stringify(
               {
-                method: "SET_USER_ID",
-                id: "5e66702a2683d514f4dc08b7"
+                method: "CONNECT_TO_TEAM",
+                teamId: "Nm0xzRhRQ",
+                token:
+                  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZTY2NzAyYTI2ODNkNTE0ZjRkYzA4YjciLCJpYXQiOjE1ODQ4NzY0NDIsImV4cCI6MTU4NDg4MDA0Mn0.5Zd87_Z7T19pwCBacnKULRo60Wf6k4AsAJQI-FCe64k"
               },
               true
             )
@@ -56,8 +56,9 @@
         ws.send(
           JSON.stringify({
             method: "START_VOTING",
-            userId: "5e66702a2683d514f4dc08b7",
-            teamId: "EgPleykkJ"
+            token:
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZTY2NzAyYTI2ODNkNTE0ZjRkYzA4YjciLCJpYXQiOjE1ODQ4NzY0NDIsImV4cCI6MTU4NDg4MDA0Mn0.5Zd87_Z7T19pwCBacnKULRo60Wf6k4AsAJQI-FCe64k",
+            teamId: "Nm0xzRhRQ"
           })
         );
       });
@@ -66,8 +67,9 @@
         ws.send(
           JSON.stringify({
             method: "SET_VOTE_VALUE",
-            userId: "5e66702a2683d514f4dc08b7",
-            teamId: "EgPleykkJ",
+            token:
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZTY2NzAyYTI2ODNkNTE0ZjRkYzA4YjciLCJpYXQiOjE1ODQ4NzY0NDIsImV4cCI6MTU4NDg4MDA0Mn0.5Zd87_Z7T19pwCBacnKULRo60Wf6k4AsAJQI-FCe64k",
+            teamId: "Nm0xzRhRQ",
             voteValue: 3
           })
         );
@@ -77,8 +79,9 @@
         ws.send(
           JSON.stringify({
             method: "STOP_VOTING",
-            userId: "5e66702a2683d514f4dc08b7",
-            teamId: "EgPleykkJ"
+            token:
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZTY2NzAyYTI2ODNkNTE0ZjRkYzA4YjciLCJpYXQiOjE1ODQ4NzI3MzEsImV4cCI6MTU4NDg3NjMzMX0.j22Zl5IATSUFLDngzpMqV8T915p6IOGlOD0F_gQhJ-c",
+            teamId: "Nm0xzRhRQ"
           })
         );
       });

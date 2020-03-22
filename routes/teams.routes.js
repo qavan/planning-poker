@@ -39,7 +39,8 @@ const getUserTeams = userId => {
 // /api/teams/create
 router.post("/create", auth, async (req, res) => {
   try {
-    const { userId, teamName, teamPass } = req.body;
+    const { teamName, teamPass } = req.body;
+    const userId = req.userId;
 
     let teamId = shortid.generate();
     while (appState.teams.teamId) {
@@ -57,11 +58,11 @@ router.post("/create", auth, async (req, res) => {
       results: {}
     };
 
-    appState.teams[teamId].users.push(userId);
-    console.log(appState);
+    // appState.teams[teamId].users.push(userId);
+    // console.log(appState);
     res.status(200).json({ message: "Команда создана!" });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(500).json({ message: "Server error!" });
   }
 });
@@ -69,7 +70,8 @@ router.post("/create", auth, async (req, res) => {
 // /api/teams/
 router.get("/", auth, async (req, res) => {
   try {
-    const { userId } = req.body;
+    // const { userId } = req.body;
+    const userId = req.userId;
 
     const result = getUserTeams(userId);
 
@@ -83,7 +85,8 @@ router.get("/", auth, async (req, res) => {
 // /api/teams/connect
 router.post("/connect", auth, async (req, res) => {
   try {
-    const { userId, teamId, teamPass } = req.body;
+    const { teamId, teamPass } = req.body;
+    const userId = req.userId;
 
     if (appState.teams[teamId].users.indexOf(userId) === -1) {
       if (!appState.teams[teamId].teamPass) {
