@@ -11,12 +11,18 @@ const combineResults = (teamId, userId) => {
   };
   for (user of appState.teams[teamId].users) {
     let status;
-    if (isLeader(teamId, userId)) {
+    if (results.status === "voting") {
+      if (isLeader(teamId, userId)) {
+        status = appState.teams[teamId].results[user]
+          ? appState.teams[teamId].results[user]
+          : "waiting";
+      } else {
+        status = appState.teams[teamId].results[user] ? "voted" : "waiting";
+      }
+    } else {
       status = appState.teams[teamId].results[user]
         ? appState.teams[teamId].results[user]
         : "waiting";
-    } else {
-      status = appState.teams[teamId].results[user] ? "voted" : "waiting";
     }
     if (isLeader(teamId, user)) {
       results.users.push({
@@ -42,6 +48,8 @@ const teamExist = teamId => {
   }
   return false;
 };
+
+// const isPasswordCorrect = (teamId, password) => {};
 
 const userInTeam = (teamId, userId) => {
   if (appState.teams[teamId].users.indexOf(userId) !== -1) {
@@ -74,6 +82,19 @@ const isVoting = teamId => {
 const resetTeamState = teamId => {
   appState.teams[teamId].status = "voting";
   appState.teams[teamId].results = {};
+};
+
+const isVotingComplete = teamId => {
+  for (user of appState.teams[teamId].users) {
+    if (!appState.teams[teamId].results[user]) {
+      return false;
+    }
+  }
+  return true;
+};
+
+const setVoteComplete = teamId => {
+  appState.teams[teamId].status = "waiting";
 };
 
 const server = new WebSocket.Server({
@@ -160,6 +181,11 @@ server.on("connection", ws => {
             if (isVoting(teamId)) {
               if (!appState.teams[teamId].results[userId]) {
                 appState.teams[teamId].results[userId] = voteValue;
+
+                if (isVotingComplete(teamId)) {
+                  setVoteComplete(teamId);
+                }
+
                 server.clients.forEach(wsc => {
                   if (
                     userInTeam(teamId, wsc.userId) ||
@@ -184,9 +210,17 @@ server.on("connection", ws => {
 
   ws.on("close", () => {
     for (team in appState.teams) {
-      if (appState.teams[team].users.indexOf(ws.userId) !== -1) {
+      if (userInTeam(team, ws.userId)) {
         const index = appState.teams[team].users.indexOf(ws.userId);
         appState.teams[team].users.splice(index, 1);
+        if (isVotingComplete(team)) {
+          setVoteComplete(team);
+          server.clients.forEach(wsc => {
+            if (userInTeam(team, wsc.userId) || isLeader(team, wsc.userId)) {
+              wsc.send(JSON.stringify(combineResults(team, wsc.userId)));
+            }
+          });
+        }
       }
     }
   });

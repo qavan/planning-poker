@@ -28,6 +28,4 @@ async function start() {
   }
 }
 
-//TODO: Auto-close voting
-
 start();
