@@ -1,5 +1,13 @@
 import React from "react";
-import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  Alert,
+  Table
+} from "react-bootstrap";
 import { Loader } from "../../components/Loader/Loader";
 import classes from "./TeamsList.module.sass";
 
@@ -68,12 +76,47 @@ export default class TeamList extends React.Component {
     });
     const data = await response.json();
     this.setState({
-      teams: data.teams
+      teams: data.teams,
+      loading: false
     });
+    console.log(this.state);
   }
 
   async componentDidMount() {
     this.loadTeams();
+  }
+
+  renderTeams() {
+    return (
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>Название</th>
+            <th>Тип доступа</th>
+            <th>Статус</th>
+          </tr>
+        </thead>
+        <tbody>
+          {this.state.teams
+            ? this.state.teams.teamOwner.map((team, index) => {
+                return (
+                  <tr key={`owner_${index}`} team={team.teamId}>
+                    <td>{team.teamName}</td>
+                    <td>
+                      {team.accessType === "open" ? "Открытый" : "По паролю"}
+                    </td>
+                    <td>
+                      {team.teamStatus === "waiting"
+                        ? "Ожидание"
+                        : "Голосование"}
+                    </td>
+                  </tr>
+                );
+              })
+            : null}
+        </tbody>
+      </Table>
+    );
   }
 
   render() {
@@ -129,6 +172,4 @@ export default class TeamList extends React.Component {
       </Container>
     );
   }
-
-  //TODO: render teams as table
 }

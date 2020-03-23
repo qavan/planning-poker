@@ -17,7 +17,8 @@ const getUserTeams = userId => {
       result.teamOwner.push({
         teamId,
         teamName: appState.teams[teamId].teamName,
-        teamStatus: appState.teams[teamId].status
+        teamStatus: appState.teams[teamId].status,
+        accessType: appState.teams[teamId].teamPass ? "password" : "open"
       });
       continue;
     }
@@ -25,14 +26,16 @@ const getUserTeams = userId => {
       result.teamUser.push({
         teamId,
         teamName: appState.teams[teamId].teamName,
-        teamStatus: appState.teams[teamId].status
+        teamStatus: appState.teams[teamId].status,
+        accessType: appState.teams[teamId].teamPass ? "password" : "open"
       });
       continue;
     }
     result.otherTeams.push({
       teamId,
       teamName: appState.teams[teamId].teamName,
-      teamStatus: appState.teams[teamId].status
+      teamStatus: appState.teams[teamId].status,
+      accessType: appState.teams[teamId].teamPass ? "password" : "open"
     });
   }
 

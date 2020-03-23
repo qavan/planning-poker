@@ -25,4 +25,25 @@ router.post("/name", auth, async (req, res) => {
   }
 });
 
+router.get("/", auth, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "Произошла ошибка, попробуйте позже!" });
+    }
+
+    const result = {
+      userName: user.userName
+    };
+
+    res.status(200).json({ result });
+  } catch (error) {
+    res.status(500).json({ message: "Server error!" });
+  }
+});
+
 module.exports = router;

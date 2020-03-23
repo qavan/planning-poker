@@ -57,7 +57,7 @@ export default class App extends React.Component {
                 <TeamsList token={this.state.userToken} />
               </Route>
               <Route path="/settings" exact>
-                <Settings />
+                <Settings token={this.state.userToken} />
               </Route>
               <Route path="/team/:id" exact>
                 <Planning />
