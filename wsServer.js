@@ -3,6 +3,7 @@ const appState = require("./state");
 const jwt = require("jsonwebtoken");
 const User = require("./models/User");
 const config = require("config");
+const bcrypt = require("bcryptjs");
 
 const combineResults = (teamId, userId) => {
   const results = {
@@ -49,7 +50,24 @@ const teamExist = teamId => {
   return false;
 };
 
-// const isPasswordCorrect = (teamId, password) => {};
+const isPasswordCorrect = (teamId, password, userId) => {
+  if (appState.teams[teamId].teamPass) {
+    if (appState.teams[teamId].loggedUsers.indexOf(userId) !== -1) {
+      return true;
+    }
+    try {
+      const result = bcrypt.compareSync(
+        password,
+        appState.teams[teamId].teamPass
+      );
+      return result;
+    } catch (error) {
+      return false;
+    }
+  } else {
+    return true;
+  }
+};
 
 const userInTeam = (teamId, userId) => {
   if (appState.teams[teamId].users.indexOf(userId) !== -1) {
@@ -114,18 +132,24 @@ server.on("connection", ws => {
       switch (jsonData.method) {
         case "CONNECT_TO_TEAM":
           if (!ws.userId) {
-            if (teamExist(jsonData.teamId)) {
-              if (isWaiting(jsonData.teamId)) {
-                const user = await User.findOne({ _id: userId });
-                if (user) {
-                  if (!userInTeam(jsonData.teamId, userId)) {
-                    appState.users[userId] = { userName: user.userName };
-                    appState.teams[jsonData.teamId].users.push(userId);
-                    ws.userId = userId;
-                    ws.send("Done");
-                  } else {
-                    ws.close(1003, "Double login!");
+            const { teamId, password } = jsonData;
+            if (teamExist(teamId)) {
+              if (isWaiting(teamId)) {
+                if (isPasswordCorrect(teamId, password, userId)) {
+                  const user = await User.findOne({ _id: userId });
+                  if (user) {
+                    if (!userInTeam(teamId, userId)) {
+                      appState.users[userId] = { userName: user.userName };
+                      appState.teams[teamId].users.push(userId);
+                      appState.teams[teamId].loggedUsers.push(userId);
+                      ws.userId = userId;
+                      ws.send("Done");
+                    } else {
+                      ws.close(1003, "Double login!");
+                    }
                   }
+                } else {
+                  ws.close(1003, "Wrong password!");
                 }
               } else {
                 ws.close(1003, 'User can connect only on "waiting" phase');

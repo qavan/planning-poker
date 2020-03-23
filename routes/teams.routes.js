@@ -16,20 +16,23 @@ const getUserTeams = userId => {
     if (appState.teams[teamId].owner === userId) {
       result.teamOwner.push({
         teamId,
-        teamName: appState.teams[teamId].teamName
+        teamName: appState.teams[teamId].teamName,
+        teamStatus: appState.teams[teamId].status
       });
       continue;
     }
-    if (appState.teams[teamId].users.indexOf(userId) !== -1) {
+    if (appState.teams[teamId].loggedUsers.indexOf(userId) !== -1) {
       result.teamUser.push({
         teamId,
-        teamName: appState.teams[teamId].teamName
+        teamName: appState.teams[teamId].teamName,
+        teamStatus: appState.teams[teamId].status
       });
       continue;
     }
     result.otherTeams.push({
       teamId,
-      teamName: appState.teams[teamId].teamName
+      teamName: appState.teams[teamId].teamName,
+      teamStatus: appState.teams[teamId].status
     });
   }
 
@@ -54,15 +57,14 @@ router.post("/create", auth, async (req, res) => {
       teamName,
       teamPass: password,
       users: [],
+      loggedUsers: [],
       status: "waiting",
       results: {}
     };
 
-    // appState.teams[teamId].users.push(userId);
-    // console.log(appState);
+    appState.teams[teamId].loggedUsers.push(userId);
     res.status(200).json({ message: "Команда создана!" });
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: "Server error!" });
   }
 });
@@ -83,30 +85,30 @@ router.get("/", auth, async (req, res) => {
 });
 
 // /api/teams/connect
-router.post("/connect", auth, async (req, res) => {
-  try {
-    const { teamId, teamPass } = req.body;
-    const userId = req.userId;
+// router.post("/connect", auth, async (req, res) => {
+//   try {
+//     const { teamId, teamPass } = req.body;
+//     const userId = req.userId;
 
-    if (appState.teams[teamId].users.indexOf(userId) === -1) {
-      if (!appState.teams[teamId].teamPass) {
-        appState.teams[teamId].users.push(userId);
-        res.status(200).json({ teams: getUserTeams(userId) });
-      }
+//     if (appState.teams[teamId].users.indexOf(userId) === -1) {
+//       if (!appState.teams[teamId].teamPass) {
+//         appState.teams[teamId].users.push(userId);
+//         res.status(200).json({ teams: getUserTeams(userId) });
+//       }
 
-      if (await bcrypt.compare(teamPass, appState.teams[teamId].teamPass)) {
-        appState.teams[teamId].users.push(userId);
-        res.status(200).json({ teams: getUserTeams(userId) });
-      } else {
-        res.status(403).json({ message: "Неверный пароль!" });
-      }
-    } else {
-      res.status(200).json({ message: "Пользователь уже в команде!" });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server error!" });
-  }
-});
+//       if (await bcrypt.compare(teamPass, appState.teams[teamId].teamPass)) {
+//         appState.teams[teamId].users.push(userId);
+//         res.status(200).json({ teams: getUserTeams(userId) });
+//       } else {
+//         res.status(403).json({ message: "Неверный пароль!" });
+//       }
+//     } else {
+//       res.status(200).json({ message: "Пользователь уже в команде!" });
+//     }
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ message: "Server error!" });
+//   }
+// });
 
 module.exports = router;
