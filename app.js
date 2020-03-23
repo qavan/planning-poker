@@ -28,8 +28,6 @@ async function start() {
   }
 }
 
-//TOOD: connect only on "waiting" phase
-//TOOD: catch errors
-//TODO: only leader can see actual state
+//TODO: Auto-close voting
 
 start();

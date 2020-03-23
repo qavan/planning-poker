@@ -22,8 +22,8 @@
     <script>
       let ws;
       let token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZTc3NzFjNTczYjRiNDFmYmNjZTU2YTkiLCJpYXQiOjE1ODQ4ODgzNjMsImV4cCI6MTU4NDg5MTk2M30.KjVaIvcU90lO5v4_6Rx6lVY9cZUxf3B9PyNZWSeZeGk";
-      let teamId = "dLiSIBPW0";
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZTY2NzAyYTI2ODNkNTE0ZjRkYzA4YjciLCJpYXQiOjE1ODQ5NTE4NzYsImV4cCI6MTU4NDk1NTQ3Nn0.ziEZpd9RGs0G-vgI9HQOVPbokJOSy5jOv88q9j9dUYM";
+      let teamId = "miTreNPtg";
 
       $("#connect").click(() => {
         ws = new WebSocket("ws://localhost:3001");
@@ -40,6 +40,10 @@
             )
           );
         };
+        ws.onclose = data => {
+          console.log(data);
+          $("#connState").html("Offline");
+        };
         ws.onmessage = data => {
           try {
             console.log(data);
@@ -48,9 +52,6 @@
           } catch (error) {
             $("#state").html(error);
           }
-        };
-        ws.onclose = () => {
-          $("#connState").html("Offline");
         };
       });
 
