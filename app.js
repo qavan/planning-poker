@@ -10,7 +10,7 @@ app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/user", require("./routes/user.routes"));
 app.use("/api/teams", require("./routes/teams.routes"));
 
-const PORT = config.get("port") || 3000;
+const PORT = config.get("port") || 5000;
 
 async function start() {
   try {

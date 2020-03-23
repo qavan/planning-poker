@@ -75,7 +75,7 @@ router.post(
       }
 
       const token = jwt.sign({ userId: user.id }, config.get("jwtSecret"), {
-        expiresIn: "24h"
+        expiresIn: "12h"
       });
       res.json({ token, userId: user.id });
     } catch (error) {
@@ -83,5 +83,21 @@ router.post(
     }
   }
 );
+
+router.post("/check", async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    const decoded = jwt.verify(token, config.get("jwtSecret"));
+
+    if (decoded) {
+      return res.status(200).json({ message: "Actual" });
+    }
+
+    res.json({ message: "Inspired" });
+  } catch (error) {
+    res.status(200).json({ message: "Inspired" });
+  }
+});
 
 module.exports = router;
