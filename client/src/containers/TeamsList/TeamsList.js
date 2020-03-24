@@ -10,6 +10,7 @@ import {
 } from "react-bootstrap";
 import { Loader } from "../../components/Loader/Loader";
 import classes from "./TeamsList.module.sass";
+import { NavLink } from "react-router-dom";
 
 export default class TeamList extends React.Component {
   state = {
@@ -115,6 +116,7 @@ export default class TeamList extends React.Component {
             <th>Название</th>
             <th>Тип доступа</th>
             <th>Статус</th>
+            <th>Подключение</th>
           </tr>
         </thead>
         <tbody>
@@ -130,6 +132,11 @@ export default class TeamList extends React.Component {
                       {team.teamStatus === "waiting"
                         ? "Ожидание"
                         : "Голосование"}
+                    </td>
+                    <td>
+                      <NavLink to={"/team/" + team.teamId}>
+                        Присоединиться
+                      </NavLink>
                     </td>
                   </tr>
                 );

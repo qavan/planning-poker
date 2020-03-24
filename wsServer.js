@@ -143,7 +143,12 @@ server.on("connection", ws => {
                       appState.teams[teamId].users.push(userId);
                       appState.teams[teamId].loggedUsers.push(userId);
                       ws.userId = userId;
-                      ws.send("Done");
+                      ws.send(
+                        JSON.stringify({
+                          message: "Done",
+                          state: combineResults(teamId, userId)
+                        })
+                      );
                     } else {
                       ws.close(1003, "Double login!");
                     }
@@ -176,7 +181,7 @@ server.on("connection", ws => {
               }
             }
           } else {
-            ws.send("Wrong team!");
+            ws.send(JSON.stringify({ message: "Wrong team!" }));
           }
           break;
         case "STOP_VOTING":
