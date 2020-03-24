@@ -34,9 +34,10 @@ export default class App extends React.Component {
       });
       const decoded = await response.json();
       if (decoded.message === "Actual") {
+        localStorage.setItem("pokerToken", decoded.newToken);
         this.setState({
           isLoggedIn: true,
-          userToken: data
+          userToken: decoded.newToken
         });
       } else {
         localStorage.removeItem("pokerToken");

@@ -22,6 +22,15 @@ export default class TeamList extends React.Component {
 
   async createTeamHandler(event) {
     event.preventDefault();
+    if (!this.state.teamName) {
+      this.setState({
+        message: {
+          type: "danger",
+          text: "Имя команды не может быть пустым!"
+        }
+      });
+      return;
+    }
     try {
       const { teamName, teamPass } = this.state;
       const response = await fetch("/api/teams/create", {
@@ -65,21 +74,33 @@ export default class TeamList extends React.Component {
   }
 
   async loadTeams() {
-    this.setState({ loading: true });
+    try {
+      this.setState({ loading: true });
 
-    const response = await fetch("/api/teams/", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.props.token}`
-      }
-    });
-    const data = await response.json();
+      const response = await fetch("/api/teams/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.props.token}`
+        }
+      });
+      const data = await response.json();
+      this.setState({
+        teams: data.teams,
+        loading: false
+      });
+      console.log(this.state);
+    } catch (error) {
+      this.setState({
+        message: {
+          type: "danger",
+          text: "Произошла ошибка при загрузке команд!"
+        }
+      });
+    }
     this.setState({
-      teams: data.teams,
       loading: false
     });
-    console.log(this.state);
   }
 
   async componentDidMount() {
@@ -160,6 +181,7 @@ export default class TeamList extends React.Component {
               <Button
                 variant="secondary"
                 onClick={event => this.createTeamHandler(event)}
+                disabled={this.state.loading}
               >
                 Создать
               </Button>

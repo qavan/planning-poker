@@ -22,8 +22,8 @@
     <script>
       let ws;
       let token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZTY2NzAyYTI2ODNkNTE0ZjRkYzA4YjciLCJpYXQiOjE1ODQ5NTU1NDksImV4cCI6MTU4NTA0MTk0OX0.vioYVTIqPUdpnQraGmVTTrXSuA6d8ia8eFX-46nQGGY";
-      let teamId = "kXMg1AhDO";
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZTY2NzAyYTI2ODNkNTE0ZjRkYzA4YjciLCJpYXQiOjE1ODUwNjA1MzIsImV4cCI6MTU4NTEwMzczMn0.R4_nRwpOABRgPVrZfwW0PyX5thXFeSIPPR0ZbepJN_E";
+      let teamId = "UnfKDChm6";
 
       $("#connect").click(() => {
         ws = new WebSocket("ws://localhost:3001");
@@ -34,7 +34,8 @@
               {
                 method: "CONNECT_TO_TEAM",
                 teamId,
-                token
+                token,
+                teamPass: "123"
               },
               true
             )

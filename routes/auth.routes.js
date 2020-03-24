@@ -91,7 +91,14 @@ router.post("/check", async (req, res) => {
     const decoded = jwt.verify(token, config.get("jwtSecret"));
 
     if (decoded) {
-      return res.status(200).json({ message: "Actual" });
+      const newToken = jwt.sign(
+        { userId: decoded.userId },
+        config.get("jwtSecret"),
+        {
+          expiresIn: "12h"
+        }
+      );
+      return res.status(200).json({ message: "Actual", newToken });
     }
 
     res.json({ message: "Inspired" });
