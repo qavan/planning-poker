@@ -59,9 +59,17 @@ export default class App extends React.Component {
           <React.Fragment>
             <Header />
             <Switch>
-              <Route path="/teams-list" exact>
-                <TeamsList token={this.state.userToken} />
-              </Route>
+              <Route
+                path="/teams-list"
+                exact
+                render={matchProps => (
+                  <TeamsList
+                    {...matchProps}
+                    {...this.props}
+                    token={this.state.userToken}
+                  />
+                )}
+              />
               <Route path="/settings" exact>
                 <Settings token={this.state.userToken} />
               </Route>
@@ -88,3 +96,5 @@ export default class App extends React.Component {
     );
   }
 }
+
+//TODO: beautify code

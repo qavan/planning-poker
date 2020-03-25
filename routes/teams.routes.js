@@ -87,31 +87,30 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
-// /api/teams/connect
-// router.post("/connect", auth, async (req, res) => {
-//   try {
-//     const { teamId, teamPass } = req.body;
-//     const userId = req.userId;
+// /api/teams/check
+router.post("/check", auth, async (req, res) => {
+  try {
+    const { teamId, teamPass } = req.body;
+    const userId = req.userId;
 
-//     if (appState.teams[teamId].users.indexOf(userId) === -1) {
-//       if (!appState.teams[teamId].teamPass) {
-//         appState.teams[teamId].users.push(userId);
-//         res.status(200).json({ teams: getUserTeams(userId) });
-//       }
+    if (appState.teams[teamId].loggedUsers.indexOf(userId) === -1) {
+      if (!appState.teams[teamId].teamPass) {
+        res.status(200).json({ message: "Команда без пароля" });
+      }
 
-//       if (await bcrypt.compare(teamPass, appState.teams[teamId].teamPass)) {
-//         appState.teams[teamId].users.push(userId);
-//         res.status(200).json({ teams: getUserTeams(userId) });
-//       } else {
-//         res.status(403).json({ message: "Неверный пароль!" });
-//       }
-//     } else {
-//       res.status(200).json({ message: "Пользователь уже в команде!" });
-//     }
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({ message: "Server error!" });
-//   }
-// });
+      if (await bcrypt.compare(teamPass, appState.teams[teamId].teamPass)) {
+        appState.teams[teamId].loggedUsers.push(userId);
+        res.status(200).json({ message: "Успешный вход" });
+      } else {
+        res.status(403).json({ message: "Неверный пароль!" });
+      }
+    } else {
+      res.status(200).json({ message: "Пользователь уже в команде!" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error!" });
+  }
+});
 
 module.exports = router;

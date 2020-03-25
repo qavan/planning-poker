@@ -186,6 +186,3 @@ export default class Planning extends React.Component {
     );
   }
 }
-
-//TODO: set table responsive
-//TODO: beautify code

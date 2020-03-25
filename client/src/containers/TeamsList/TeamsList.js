@@ -11,6 +11,7 @@ import {
 import { Loader } from "../../components/Loader/Loader";
 import classes from "./TeamsList.module.sass";
 import { NavLink } from "react-router-dom";
+import ModalPassword from "../../components/ModalPassword/ModalPassword";
 
 export default class TeamList extends React.Component {
   state = {
@@ -18,7 +19,9 @@ export default class TeamList extends React.Component {
     teamPass: "",
     message: null,
     loading: true,
-    teams: null
+    teams: null,
+    showModal: false,
+    selectedTeamId: null
   };
 
   async createTeamHandler(event) {
@@ -109,9 +112,23 @@ export default class TeamList extends React.Component {
     this.loadTeams();
   }
 
+  showModalHandler = teamId => {
+    this.setState({
+      showModal: true,
+      selectedTeamId: teamId
+    });
+  };
+
+  closeModalHandler = () => {
+    this.setState({
+      showModal: false,
+      selectedTeamId: null
+    });
+  };
+
   renderTeams() {
     return (
-      <Table striped bordered hover>
+      <Table striped bordered hover responsive>
         <thead>
           <tr>
             <th>Название</th>
@@ -179,9 +196,19 @@ export default class TeamList extends React.Component {
                         : "Голосование"}
                     </td>
                     <td>
-                      <NavLink to={"/team/" + team.teamId}>
-                        Присоединиться
-                      </NavLink>
+                      {team.accessType !== "open" ? (
+                        <a
+                          onClick={() => {
+                            this.showModalHandler(team.teamId);
+                          }}
+                        >
+                          Войти по паролю
+                        </a>
+                      ) : (
+                        <NavLink to={"/team/" + team.teamId}>
+                          Присоединиться
+                        </NavLink>
+                      )}
                     </td>
                   </tr>
                 );
@@ -194,56 +221,66 @@ export default class TeamList extends React.Component {
 
   render() {
     return (
-      <Container>
-        <Row>
-          <Col>
-            <h4 className={`text-center ${classes.title}`}>Создать команду</h4>
-            {this.state.message ? (
-              <Alert variant={this.state.message.type}>
-                {this.state.message.text}
-              </Alert>
-            ) : null}
-            <Form>
-              <Form.Group>
-                <Form.Label>Название</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Введите название"
-                  value={this.state.teamName}
-                  onChange={event =>
-                    this.setState({ teamName: event.target.value })
-                  }
-                />
-              </Form.Group>
+      <React.Fragment>
+        <Container>
+          <Row>
+            <Col>
+              <h4 className={`text-center ${classes.title}`}>
+                Создать команду
+              </h4>
+              {this.state.message ? (
+                <Alert variant={this.state.message.type}>
+                  {this.state.message.text}
+                </Alert>
+              ) : null}
+              <Form>
+                <Form.Group>
+                  <Form.Label>Название</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Введите название"
+                    value={this.state.teamName}
+                    onChange={event =>
+                      this.setState({ teamName: event.target.value })
+                    }
+                  />
+                </Form.Group>
 
-              <Form.Group>
-                <Form.Label>Пароль</Form.Label>
-                <Form.Control
-                  type="password"
-                  placeholder="Введите пароль"
-                  value={this.state.teamPass}
-                  onChange={event =>
-                    this.setState({ teamPass: event.target.value })
-                  }
-                />
-                <Form.Text className="text-muted">
-                  Необязательное поле
-                </Form.Text>
-              </Form.Group>
-              <Button
-                variant="secondary"
-                onClick={event => this.createTeamHandler(event)}
-                disabled={this.state.loading}
-              >
-                Создать
-              </Button>
-            </Form>
-            <hr />
-            <h4 className={`text-center ${classes.title}`}>Список команд</h4>
-            {this.state.loading ? <Loader /> : this.renderTeams()}
-          </Col>
-        </Row>
-      </Container>
+                <Form.Group>
+                  <Form.Label>Пароль</Form.Label>
+                  <Form.Control
+                    type="password"
+                    placeholder="Введите пароль"
+                    value={this.state.teamPass}
+                    onChange={event =>
+                      this.setState({ teamPass: event.target.value })
+                    }
+                  />
+                  <Form.Text className="text-muted">
+                    Необязательное поле
+                  </Form.Text>
+                </Form.Group>
+                <Button
+                  variant="secondary"
+                  onClick={event => this.createTeamHandler(event)}
+                  disabled={this.state.loading}
+                >
+                  Создать
+                </Button>
+              </Form>
+              <hr />
+              <h4 className={`text-center ${classes.title}`}>Список команд</h4>
+              {this.state.loading ? <Loader /> : this.renderTeams()}
+            </Col>
+          </Row>
+        </Container>
+        <ModalPassword
+          showModal={this.state.showModal}
+          closeModal={this.closeModalHandler}
+          teamId={this.state.selectedTeamId}
+          token={this.props.token}
+        />
+      </React.Fragment>
     );
   }
 }

@@ -3,7 +3,7 @@ import { Table } from "react-bootstrap";
 
 export const Results = props => {
   return (
-    <Table striped bordered hover>
+    <Table striped bordered hover responsive>
       <thead>
         <tr>
           <th>Пользователь</th>
