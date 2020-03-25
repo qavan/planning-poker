@@ -27,6 +27,7 @@ const combineResults = (teamId, userId) => {
     }
     if (isLeader(teamId, user)) {
       results.users.push({
+        userId: user,
         name: appState.users[user].userName,
         status,
         owner: true
@@ -35,6 +36,7 @@ const combineResults = (teamId, userId) => {
     }
     if (appState.teams[teamId].users.indexOf(user) !== -1) {
       results.users.push({
+        userId: user,
         name: appState.users[user].userName,
         status
       });
@@ -143,12 +145,17 @@ server.on("connection", ws => {
                       appState.teams[teamId].users.push(userId);
                       appState.teams[teamId].loggedUsers.push(userId);
                       ws.userId = userId;
-                      ws.send(
-                        JSON.stringify({
-                          message: "Done",
-                          state: combineResults(teamId, userId)
-                        })
-                      );
+                      ws.send(JSON.stringify(combineResults(teamId, userId)));
+                      server.clients.forEach(wsc => {
+                        if (
+                          userInTeam(teamId, wsc.userId) ||
+                          isLeader(teamId, wsc.userId)
+                        ) {
+                          wsc.send(
+                            JSON.stringify(combineResults(teamId, userId))
+                          );
+                        }
+                      });
                     } else {
                       ws.close(1003, "Double login!");
                     }

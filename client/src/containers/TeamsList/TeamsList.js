@@ -86,6 +86,7 @@ export default class TeamList extends React.Component {
         }
       });
       const data = await response.json();
+      console.log(data);
       this.setState({
         teams: data.teams,
         loading: false
@@ -120,8 +121,52 @@ export default class TeamList extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {this.state.teams
+          {this.state.teams.teamOwner
             ? this.state.teams.teamOwner.map((team, index) => {
+                return (
+                  <tr key={`owner_${index}`} team={team.teamId}>
+                    <td>{team.teamName} (Лидер)</td>
+                    <td>
+                      {team.accessType === "open" ? "Открытый" : "По паролю"}
+                    </td>
+                    <td>
+                      {team.teamStatus === "waiting"
+                        ? "Ожидание"
+                        : "Голосование"}
+                    </td>
+                    <td>
+                      <NavLink to={"/team/" + team.teamId}>
+                        Присоединиться
+                      </NavLink>
+                    </td>
+                  </tr>
+                );
+              })
+            : null}
+          {this.state.teams.teamUser
+            ? this.state.teams.teamUser.map((team, index) => {
+                return (
+                  <tr key={`owner_${index}`} team={team.teamId}>
+                    <td>{team.teamName} (Участник)</td>
+                    <td>
+                      {team.accessType === "open" ? "Открытый" : "По паролю"}
+                    </td>
+                    <td>
+                      {team.teamStatus === "waiting"
+                        ? "Ожидание"
+                        : "Голосование"}
+                    </td>
+                    <td>
+                      <NavLink to={"/team/" + team.teamId}>
+                        Присоединиться
+                      </NavLink>
+                    </td>
+                  </tr>
+                );
+              })
+            : null}
+          {this.state.teams.otherTeams
+            ? this.state.teams.otherTeams.map((team, index) => {
                 return (
                   <tr key={`owner_${index}`} team={team.teamId}>
                     <td>{team.teamName}</td>

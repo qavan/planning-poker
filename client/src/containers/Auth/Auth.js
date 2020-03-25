@@ -69,7 +69,8 @@ export default class Auth extends React.Component {
       });
       const data = await response.json();
       if (data.token) {
-        this.props.onLogin(data.token);
+        console.log(data);
+        this.props.onLogin(data.token, data.userId);
       } else {
         this.setState({
           message: {

@@ -9,27 +9,31 @@ import { Switch, Route, Redirect } from "react-router-dom";
 export default class App extends React.Component {
   state = {
     isLoggedIn: false,
-    userToken: ""
+    userToken: "",
+    userId: ""
   };
 
-  setToken = token => {
+  setToken = (token, userId) => {
     localStorage.setItem("pokerToken", token);
+    localStorage.setItem("pokerId", userId);
     this.setState({
       isLoggedIn: true,
-      userToken: token
+      userToken: token,
+      userId
     });
   };
 
   async componentDidMount() {
-    const data = localStorage.getItem("pokerToken");
-    if (data) {
+    const dataToken = localStorage.getItem("pokerToken");
+    const dataId = localStorage.getItem("pokerId");
+    if (dataToken && dataId) {
       const response = await fetch("/api/auth/check", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          token: data
+          token: dataToken
         })
       });
       const decoded = await response.json();
@@ -37,7 +41,8 @@ export default class App extends React.Component {
         localStorage.setItem("pokerToken", decoded.newToken);
         this.setState({
           isLoggedIn: true,
-          userToken: decoded.newToken
+          userToken: decoded.newToken,
+          userId: dataId
         });
       } else {
         localStorage.removeItem("pokerToken");
@@ -68,6 +73,7 @@ export default class App extends React.Component {
                     {...matchProps}
                     {...this.props}
                     token={this.state.userToken}
+                    userId={this.state.userId}
                   />
                 )}
               />
