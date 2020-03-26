@@ -36,6 +36,9 @@ export default class TeamList extends React.Component {
       return;
     }
     try {
+      this.setState({
+        loading: true
+      });
       const { teamName, teamPass } = this.state;
       const response = await fetch("/api/teams/create", {
         method: "POST",
@@ -75,6 +78,9 @@ export default class TeamList extends React.Component {
         }
       });
     }
+    this.setState({
+      loading: false
+    });
   }
 
   async loadTeams() {
@@ -197,13 +203,14 @@ export default class TeamList extends React.Component {
                     </td>
                     <td>
                       {team.accessType !== "open" ? (
-                        <a
+                        <span
+                          className={classes.openModal}
                           onClick={() => {
                             this.showModalHandler(team.teamId);
                           }}
                         >
                           Войти по паролю
-                        </a>
+                        </span>
                       ) : (
                         <NavLink to={"/team/" + team.teamId}>
                           Присоединиться

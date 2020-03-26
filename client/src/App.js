@@ -23,6 +23,17 @@ export default class App extends React.Component {
     });
   };
 
+  logout = () => {
+    if (localStorage.getItem("pokerId")) localStorage.removeItem("pokerId");
+    if (localStorage.getItem("pokerToken"))
+      localStorage.removeItem("pokerToken");
+    this.setState({
+      isLoggedIn: false,
+      userToken: "",
+      userId: ""
+    });
+  };
+
   async componentDidMount() {
     const dataToken = localStorage.getItem("pokerToken");
     const dataId = localStorage.getItem("pokerId");
@@ -57,7 +68,7 @@ export default class App extends React.Component {
           <Auth onLogin={this.setToken} />
         ) : (
           <React.Fragment>
-            <Header />
+            <Header onLogout={this.logout} />
             <Switch>
               <Route
                 path="/teams-list"
@@ -98,3 +109,4 @@ export default class App extends React.Component {
 }
 
 //TODO: beautify code
+//TODO: save voting report to db

@@ -2,7 +2,7 @@ import React from "react";
 import { Navbar, Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 
-const Header = () => {
+const Header = props => {
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
       <Navbar.Brand>Poker</Navbar.Brand>
@@ -20,6 +20,9 @@ const Header = () => {
           >
             Настройки
           </NavLink>
+        </Nav>
+        <Nav>
+          <Nav.Link onClick={props.onLogout}>Выйти</Nav.Link>
         </Nav>
       </Navbar.Collapse>
     </Navbar>

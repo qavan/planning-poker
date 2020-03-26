@@ -20,7 +20,7 @@ export default class Planning extends React.Component {
 
   componentDidMount() {
     try {
-      let ws = new WebSocket("ws://localhost:3001");
+      let ws = new WebSocket("ws://192.168.1.14:3001");
       ws.onopen = () => {
         ws.send(
           JSON.stringify({
@@ -36,7 +36,7 @@ export default class Planning extends React.Component {
         if (decoded.status && decoded.status === "waiting") {
           let adminButtonsVisible = false;
           decoded.users.map(user => {
-            if (user.userId == this.props.userId && user.owner === true) {
+            if (user.userId === this.props.userId && user.owner === true) {
               adminButtonsVisible = true;
             }
             return null;
@@ -53,10 +53,13 @@ export default class Planning extends React.Component {
           let adminButtonsVisible = false;
           let userVoted = false;
           decoded.users.map(user => {
-            if (user.userId == this.props.userId && user.owner === true) {
+            if (user.userId === this.props.userId && user.owner === true) {
               adminButtonsVisible = true;
             }
-            if (user.userId == this.props.userId && user.status !== "waiting") {
+            if (
+              user.userId === this.props.userId &&
+              user.status !== "waiting"
+            ) {
               userVoted = true;
             }
             return null;
@@ -166,6 +169,9 @@ export default class Planning extends React.Component {
                     <h4 className={`text-center ${classes.title}`}>
                       Планирование
                     </h4>
+                    <h6 className={`text-center ${classes.title}`}>
+                      Ожидание окончания голосования
+                    </h6>
                     {!this.state.userVoted ? (
                       <MarksList
                         marks={this.state.marks}

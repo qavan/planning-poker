@@ -256,6 +256,12 @@ server.on("connection", ws => {
               wsc.send(JSON.stringify(combineResults(team, wsc.userId)));
             }
           });
+        } else {
+          server.clients.forEach(wsc => {
+            if (userInTeam(team, wsc.userId) || isLeader(team, wsc.userId)) {
+              wsc.send(JSON.stringify(combineResults(team, wsc.userId)));
+            }
+          });
         }
       }
     }
