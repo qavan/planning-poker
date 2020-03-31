@@ -8,6 +8,7 @@ const bcrypt = require("bcryptjs");
 const combineResults = (teamId, userId) => {
   const results = {
     status: appState.teams[teamId].status,
+    theme: appState.teams[teamId].theme,
     users: []
   };
   for (user of appState.teams[teamId].users) {
@@ -169,6 +170,24 @@ server.on("connection", ws => {
             } else {
               ws.close(1003, "Wrong team!");
             }
+          }
+          break;
+        case "SET_THEME":
+          if (teamExist(jsonData.teamId)) {
+            const { teamId, theme } = jsonData;
+            if (isLeader(teamId, userId)) {
+              appState.teams[teamId].theme = theme;
+              server.clients.forEach(wsc => {
+                if (
+                  userInTeam(teamId, wsc.userId) ||
+                  isLeader(teamId, wsc.userId)
+                ) {
+                  wsc.send(JSON.stringify(combineResults(teamId, userId)));
+                }
+              });
+            }
+          } else {
+            ws.send(JSON.stringify({ message: "Wrong team!" }));
           }
           break;
         case "START_VOTING":

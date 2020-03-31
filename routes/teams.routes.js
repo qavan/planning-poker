@@ -62,7 +62,8 @@ router.post("/create", auth, async (req, res) => {
       users: [],
       loggedUsers: [],
       status: "waiting",
-      results: {}
+      results: {},
+      theme: null
     };
 
     appState.teams[teamId].loggedUsers.push(userId);
@@ -106,6 +107,32 @@ router.post("/check", auth, async (req, res) => {
       }
     } else {
       res.status(200).json({ message: "Пользователь уже в команде!" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error!" });
+  }
+});
+
+// /api/teams/delete
+router.post("/delete", auth, async (req, res) => {
+  try {
+    const { teamId } = req.body;
+    const userId = req.userId;
+
+    if (appState.teams[teamId].owner === userId) {
+      if (!appState.teams[teamId].users.length) {
+        delete appState.teams[teamId];
+        res.status(200).json({ message: "Команда удалена" });
+      } else {
+        res
+          .status(403)
+          .json({
+            message: "Невозможно удалить команду, пока в ней есть пользователи!"
+          });
+      }
+    } else {
+      res.status(403).json({ message: "Недостаточно прав!" });
     }
   } catch (error) {
     console.log(error);

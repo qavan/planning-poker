@@ -271,8 +271,16 @@ export default class TeamList extends React.Component {
                   variant="secondary"
                   onClick={event => this.createTeamHandler(event)}
                   disabled={this.state.loading}
+                  className={classes.mr20}
                 >
                   Создать
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={this.loadTeams.bind(this)}
+                  disabled={this.state.loading}
+                >
+                  Обновить список
                 </Button>
               </Form>
               <hr />

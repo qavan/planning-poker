@@ -1,11 +1,9 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
-import classes from "./Planning.module.sass";
-import { Results } from "../../components/Results/Results";
-import { MarksList } from "../../components/MarksList/MarksList";
 import { Loader } from "../../components/Loader/Loader";
-import { AdminButtonsStart } from "../../components/AdminButtonsStart/AdminButtonsStart";
-import { AdminButtonsStop } from "../../components/AdminButtonsStop/AdminButtonsStop";
+import { EditTheme } from "../../components/EditTheme/EditTheme";
+import { PlanningWaiting } from "../../components/PlanningWaiting/PlanningWaiting";
+import { PlanningVoting } from "../../components/PlanningVoting/PlanningVoting";
 
 export default class Planning extends React.Component {
   state = {
@@ -15,7 +13,8 @@ export default class Planning extends React.Component {
     currentState: null,
     marks: [1, 3, 5, 7, 9, 11, 13],
     connection: null,
-    showAdminButtons: false
+    showAdminButtons: false,
+    theme: null
   };
 
   componentDidMount() {
@@ -47,6 +46,7 @@ export default class Planning extends React.Component {
             lastState: {
               users: decoded.users
             },
+            theme: decoded.theme,
             showAdminButtons: adminButtonsVisible
           });
         } else {
@@ -70,12 +70,14 @@ export default class Planning extends React.Component {
             currentState: {
               users: decoded.users
             },
+            theme: decoded.theme,
             userVoted,
             showAdminButtons: adminButtonsVisible
           });
         }
       };
-      ws.onclose = () => {
+      ws.onclose = data => {
+        console.log(data);
         this.props.history.push("/teams");
       };
       this.setState({
@@ -129,65 +131,65 @@ export default class Planning extends React.Component {
     }
   };
 
+  setVotingTheme = voteTheme => {
+    if (this.state.connection) {
+      this.state.connection.send(
+        JSON.stringify({
+          method: "SET_THEME",
+          token: this.props.token,
+          theme: voteTheme,
+          teamId: this.props.match.params.id
+        })
+      );
+    }
+  };
+
   render() {
+    if (this.state.loading) {
+      return (
+        <Container>
+          <Row>
+            <Col>
+              <Loader />
+            </Col>
+          </Row>
+        </Container>
+      );
+    }
     return (
       <Container>
         <Row>
           <Col>
-            {this.state.loading ? (
-              <Loader />
+            {this.state.status === "waiting" ? (
+              <PlanningWaiting
+                theme={this.state.theme}
+                lastState={this.state.lastState}
+                showAdminButtons={this.state.showAdminButtons}
+                startVoting={this.startVoting}
+              />
             ) : (
-              <React.Fragment>
-                {this.state.status === "waiting" ? (
-                  <React.Fragment>
-                    {this.state.lastState ? (
-                      <React.Fragment>
-                        <h4 className={`text-center ${classes.title}`}>
-                          Ожидание начала голосования
-                        </h4>
-                        <h6 className={`text-center ${classes.title}`}>
-                          Результат последнего голосования
-                        </h6>
-                        <Results results={this.state.lastState} />
-                        {this.state.showAdminButtons ? (
-                          <AdminButtonsStart onStart={this.startVoting} />
-                        ) : null}
-                      </React.Fragment>
-                    ) : (
-                      <React.Fragment>
-                        <h4 className={`text-center ${classes.title}`}>
-                          Ожидание начала голосования
-                        </h4>
-                        {this.state.showAdminButtons ? (
-                          <AdminButtonsStart onStart={this.startVoting} />
-                        ) : null}
-                      </React.Fragment>
-                    )}
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>
-                    <h4 className={`text-center ${classes.title}`}>
-                      Планирование
-                    </h4>
-                    <h6 className={`text-center ${classes.title}`}>
-                      Ожидание окончания голосования
-                    </h6>
-                    {!this.state.userVoted ? (
-                      <MarksList
-                        marks={this.state.marks}
-                        onVote={this.setVote}
-                      />
-                    ) : null}
-                    <Results results={this.state.currentState} />
-                    {this.state.showAdminButtons ? (
-                      <AdminButtonsStop onStop={this.stopVoting} />
-                    ) : null}
-                  </React.Fragment>
-                )}
-              </React.Fragment>
+              <PlanningVoting
+                theme={this.state.theme}
+                userVoted={this.state.userVoted}
+                marks={this.state.marks}
+                setVote={this.setVote}
+                currentState={this.state.currentState}
+                stopVoting={this.stopVoting}
+                showAdminButtons={this.state.showAdminButtons}
+              />
             )}
           </Col>
         </Row>
+        {this.state.loading ? null : (
+          <React.Fragment>
+            {this.state.showAdminButtons ? (
+              <EditTheme
+                onSet={this.setVotingTheme}
+                currentTheme={this.state.theme}
+              />
+            ) : null}
+          </React.Fragment>
+        )}
       </Container>
     );
   }

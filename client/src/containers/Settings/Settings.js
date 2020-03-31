@@ -87,6 +87,17 @@ export default class Settings extends React.Component {
   }
 
   render() {
+    if (this.state.loading) {
+      return (
+        <Container>
+          <Row>
+            <Col>
+              <Loader />
+            </Col>
+          </Row>
+        </Container>
+      );
+    }
     return (
       <Container>
         <Row>
@@ -99,29 +110,26 @@ export default class Settings extends React.Component {
                 {this.state.message.text}
               </Alert>
             ) : null}
-            {this.state.loading ? (
-              <Loader />
-            ) : (
-              <Form>
-                <Form.Group>
-                  <Form.Label>Имя пользователя</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Введите имя пользователя"
-                    value={this.state.userName}
-                    onChange={event =>
-                      this.setState({ userName: event.target.value })
-                    }
-                  />
-                </Form.Group>
-                <Button
-                  variant="secondary"
-                  onClick={this.updateUserNameHandler.bind(this)}
-                >
-                  Обновить
-                </Button>
-              </Form>
-            )}
+
+            <Form>
+              <Form.Group>
+                <Form.Label>Имя пользователя</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Введите имя пользователя"
+                  value={this.state.userName}
+                  onChange={event =>
+                    this.setState({ userName: event.target.value })
+                  }
+                />
+              </Form.Group>
+              <Button
+                variant="secondary"
+                onClick={this.updateUserNameHandler.bind(this)}
+              >
+                Обновить
+              </Button>
+            </Form>
           </Col>
         </Row>
       </Container>
