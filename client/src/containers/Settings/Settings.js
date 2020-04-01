@@ -1,13 +1,31 @@
 import React from "react";
-import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
+import { Container, Row, Col, Alert } from "react-bootstrap";
 import { Loader } from "../../components/Loader/Loader";
 import classes from "./Settings.module.sass";
+import UserSettings from "../../components/UserSettings/UserSettings";
+import { UserTeamsList } from "../../components/UserTeamsList/UserTeamsList";
 
 export default class Settings extends React.Component {
   state = {
     loading: true,
     userName: "",
-    message: null
+    message: null,
+    userTeams: null
+  };
+
+  setMessage = (type, message) => {
+    this.setState({
+      message: {
+        type,
+        text: message
+      }
+    });
+  };
+
+  setLoading = value => {
+    this.setState({
+      loading: value
+    });
   };
 
   async loadUserSettings() {
@@ -23,15 +41,11 @@ export default class Settings extends React.Component {
       console.log(data);
       this.setState({
         loading: false,
-        userName: data.result.userName
+        userName: data.result.userName,
+        userTeams: data.result.teams
       });
     } catch (error) {
-      this.setState({
-        message: {
-          type: "danger",
-          text: "Произошла ошибка!"
-        }
-      });
+      this.setMessage("danger", "Произошла ошибка!");
     }
   }
 
@@ -39,11 +53,8 @@ export default class Settings extends React.Component {
     await this.loadUserSettings();
   }
 
-  async updateUserNameHandler() {
-    const { userName } = this.state;
-    this.setState({
-      loading: true
-    });
+  async updateUserNameHandler(userName) {
+    this.setLoading(true);
 
     try {
       const response = await fetch("/api/user/name", {
@@ -57,33 +68,44 @@ export default class Settings extends React.Component {
         })
       });
       const data = await response.json();
+
       if (response.status === 200) {
-        this.setState({
-          message: {
-            type: "success",
-            text: data.message
-          }
-        });
-        this.loadUserSettings();
+        this.setMessage("success", data.message);
+        await this.loadUserSettings();
       } else {
-        this.setState({
-          message: {
-            type: "danger",
-            text: "Произошла ошибка!"
-          }
-        });
+        this.setMessage("danger", "Произошла ошибка!");
       }
     } catch (error) {
-      this.setState({
-        message: {
-          type: "danger",
-          text: "Произошла ошибка!"
-        }
-      });
+      this.setMessage("danger", "Произошла ошибка!");
     }
-    this.setState({
-      loading: false
-    });
+
+    this.setLoading(false);
+  }
+
+  async deleteTeam(teamId) {
+    this.setLoading(true);
+
+    try {
+      const response = await fetch("/api/teams/delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.props.token}`
+        },
+        body: JSON.stringify({
+          teamId
+        })
+      });
+      const data = await response.json();
+      if (response.status === 200) {
+        this.setMessage("success", data.message);
+      } else {
+        this.setMessage("danger", data.message);
+      }
+    } catch (error) {}
+    await this.loadUserSettings();
+
+    this.setLoading(false);
   }
 
   render() {
@@ -110,31 +132,22 @@ export default class Settings extends React.Component {
                 {this.state.message.text}
               </Alert>
             ) : null}
-
-            <Form>
-              <Form.Group>
-                <Form.Label>Имя пользователя</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Введите имя пользователя"
-                  value={this.state.userName}
-                  onChange={event =>
-                    this.setState({ userName: event.target.value })
-                  }
-                />
-              </Form.Group>
-              <Button
-                variant="secondary"
-                onClick={this.updateUserNameHandler.bind(this)}
-              >
-                Обновить
-              </Button>
-            </Form>
           </Col>
         </Row>
+        <Row>
+          <Col>
+            <UserSettings
+              onSend={this.updateUserNameHandler.bind(this)}
+              userName={this.state.userName}
+            />
+            <hr />
+          </Col>
+        </Row>
+        <UserTeamsList
+          teamsList={this.state.userTeams}
+          onDelete={this.deleteTeam.bind(this)}
+        />
       </Container>
     );
-  }
-
-  //TODO: delete room, when this room has no users
+  } 
 }

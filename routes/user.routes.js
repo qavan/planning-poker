@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const User = require("../models/User");
 const auth = require("../middleware/auth.middleware");
+const appState = require("../state");
 const router = Router();
 
 // /api/user/name
@@ -25,6 +26,7 @@ router.post("/name", auth, async (req, res) => {
   }
 });
 
+// /api/user/
 router.get("/", auth, async (req, res) => {
   try {
     const userId = req.userId;
@@ -37,8 +39,18 @@ router.get("/", auth, async (req, res) => {
     }
 
     const result = {
-      userName: user.userName
+      userName: user.userName,
+      teams: []
     };
+
+    for (team in appState.teams) {
+      if (appState.teams[team].owner === userId) {
+        result.teams.push({
+          teamId: team,
+          teamName: appState.teams[team].teamName
+        });
+      }
+    }
 
     res.status(200).json({ result });
   } catch (error) {
