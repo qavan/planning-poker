@@ -71,7 +71,7 @@ router.post("/create", auth, async (req, res) => {
       loggedUsers: [],
       status: "waiting",
       results: {},
-      theme: null
+      theme: "Не указана"
     };
 
     appState.teams[team.id].loggedUsers.push(userId);

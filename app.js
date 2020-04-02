@@ -32,7 +32,7 @@ async function start() {
           loggedUsers: item.loggedUsers.users,
           status: "waiting",
           results: {},
-          theme: null
+          theme: "Не указана"
         };
       });
       console.log(`App has been started on port ${PORT}!`);

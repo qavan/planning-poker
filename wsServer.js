@@ -4,6 +4,53 @@ const jwt = require("jsonwebtoken");
 const User = require("./models/User");
 const config = require("config");
 const bcrypt = require("bcryptjs");
+const Result = require("./models/Result");
+
+const calcAverage = teamId => {
+  if (!appState.teams[teamId].results) {
+    return 0;
+  }
+  let summ = 0;
+  let counter = 0;
+  for (let user in appState.teams[teamId].results) {
+    if (parseInt(appState.teams[teamId].results[user])) {
+      summ += parseInt(appState.teams[teamId].results[user]);
+      counter++;
+    }
+  }
+  if (counter) {
+    return summ / counter;
+  }
+  return 0;
+};
+
+const saveResult = async teamId => {
+  try {
+    const results = { users: [] };
+    for (user in appState.teams[teamId].results) {
+      if (appState.teams[teamId].results[user]) {
+        results.users.push({
+          userName: appState.users[user].userName,
+          userId: user,
+          value: appState.teams[teamId].results[user]
+        });
+      }
+    }
+    if (!results.users) {
+      return;
+    }
+    const result = new Result({
+      teamName: appState.teams[teamId].teamName,
+      teamId,
+      theme: appState.teams[teamId].theme,
+      average: calcAverage(teamId),
+      results
+    });
+    await result.save();
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const combineResults = (teamId, userId) => {
   const results = {
@@ -219,6 +266,7 @@ server.on("connection", ws => {
             if (appState.teams[teamId].owner == userId) {
               if (isVoting(teamId)) {
                 appState.teams[teamId].status = "waiting";
+                await saveResult(teamId);
                 server.clients.forEach(wsc => {
                   if (
                     userInTeam(teamId, wsc.userId) ||
@@ -242,6 +290,7 @@ server.on("connection", ws => {
 
                 if (isVotingComplete(teamId)) {
                   setVoteComplete(teamId);
+                  await saveResult(teamId);
                 }
 
                 server.clients.forEach(wsc => {

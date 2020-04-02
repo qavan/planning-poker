@@ -5,6 +5,24 @@ import { Results } from "../Results/Results";
 import { AdminButtonsStop } from "../AdminButtonsStop/AdminButtonsStop";
 
 export const PlanningVoting = props => {
+  const calcAverage = () => {
+    if (!props.currentState) {
+      return "Не известно";
+    }
+    let summ = 0;
+    let counter = 0;
+    for (let user of props.currentState.users) {
+      if (parseInt(user.status)) {
+        summ += parseInt(user.status);
+        counter++;
+      }
+    }
+    if (counter) {
+      return summ / counter;
+    }
+    return "Не известно";
+  };
+
   return (
     <React.Fragment>
       <h4 className={`text-center ${classes.title}`}>Планирование</h4>
@@ -18,6 +36,9 @@ export const PlanningVoting = props => {
         <MarksList marks={props.marks} onVote={props.setVote} />
       ) : null}
       <Results results={props.currentState} />
+      <h6 className={`text-center ${classes.title}`}>
+        Среднее: {calcAverage()}
+      </h6>
       {props.showAdminButtons ? (
         <AdminButtonsStop onStop={props.stopVoting} />
       ) : null}

@@ -14,7 +14,7 @@ export default class Planning extends React.Component {
     marks: [1, 3, 5, 7, 9, 11, 13],
     connection: null,
     showAdminButtons: false,
-    theme: null
+    theme: ""
   };
 
   componentDidMount() {
