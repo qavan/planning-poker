@@ -4,6 +4,7 @@ const router = Router();
 const appState = require("../state");
 const shortid = require("shortid");
 const bcrypt = require("bcryptjs");
+const Team = require("../models/Team");
 
 const getUserTeams = userId => {
   const result = {
@@ -48,14 +49,21 @@ router.post("/create", auth, async (req, res) => {
     const { teamName, teamPass } = req.body;
     const userId = req.userId;
 
-    let teamId = shortid.generate();
-    while (appState.teams.teamId) {
-      teamId = shortid.generate();
-    }
-
     let password = teamPass ? await bcrypt.hash(teamPass, 12) : "";
 
-    appState.teams[teamId] = {
+    const team = new Team({
+      teamName,
+      teamPass: password,
+      owner: userId,
+      loggedUsers: {
+        users: []
+      },
+      active: true
+    });
+
+    await team.save();
+
+    appState.teams[team.id] = {
       owner: userId,
       teamName,
       teamPass: password,
@@ -66,9 +74,10 @@ router.post("/create", auth, async (req, res) => {
       theme: null
     };
 
-    appState.teams[teamId].loggedUsers.push(userId);
+    appState.teams[team.id].loggedUsers.push(userId);
     res.status(200).json({ message: "Команда создана!" });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Server error!" });
   }
 });
@@ -100,6 +109,9 @@ router.post("/check", auth, async (req, res) => {
       }
 
       if (await bcrypt.compare(teamPass, appState.teams[teamId].teamPass)) {
+        const team = await Team.findById(teamId);
+        team.loggedUsers.users.push(userId);
+        await team.save();
         appState.teams[teamId].loggedUsers.push(userId);
         res.status(200).json({ message: "Успешный вход" });
       } else {
@@ -122,14 +134,15 @@ router.post("/delete", auth, async (req, res) => {
 
     if (appState.teams[teamId].owner === userId) {
       if (!appState.teams[teamId].users.length) {
+        const team = await Team.findById(teamId);
+        team.active = false;
+        await team.save();
         delete appState.teams[teamId];
         res.status(200).json({ message: "Команда удалена" });
       } else {
-        res
-          .status(403)
-          .json({
-            message: "Невозможно удалить команду, пока в ней есть пользователи!"
-          });
+        res.status(403).json({
+          message: "Невозможно удалить команду, пока в ней есть пользователи!"
+        });
       }
     } else {
       res.status(403).json({ message: "Недостаточно прав!" });

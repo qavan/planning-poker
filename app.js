@@ -3,6 +3,8 @@ const config = require("config");
 const mongoose = require("mongoose");
 const app = express();
 const wsServer = require("./wsServer");
+const appState = require("./state");
+const Team = require("./models/Team");
 
 app.use(express.json({ extended: true }));
 
@@ -19,7 +21,20 @@ async function start() {
       useUnifiedTopology: true,
       useCreateIndex: true
     });
-    app.listen(PORT, () => {
+    app.listen(PORT, async () => {
+      const result = await Team.find({ active: true });
+      result.map(item => {
+        appState.teams[item._id] = {
+          owner: item.owner,
+          teamName: item.teamName,
+          teamPass: item.teamPass,
+          users: [],
+          loggedUsers: item.loggedUsers.users,
+          status: "waiting",
+          results: {},
+          theme: null
+        };
+      });
       console.log(`App has been started on port ${PORT}!`);
     });
   } catch (error) {

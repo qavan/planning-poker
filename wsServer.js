@@ -138,7 +138,10 @@ server.on("connection", ws => {
             const { teamId, password } = jsonData;
             if (teamExist(teamId)) {
               if (isWaiting(teamId)) {
-                if (isPasswordCorrect(teamId, password, userId)) {
+                if (
+                  isPasswordCorrect(teamId, password, userId) ||
+                  isLeader(teamId, userId)
+                ) {
                   const user = await User.findOne({ _id: userId });
                   if (user) {
                     if (!userInTeam(teamId, userId)) {
