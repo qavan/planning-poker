@@ -5,6 +5,7 @@ const app = express();
 const wsServer = require("./wsServer");
 const appState = require("./state");
 const Team = require("./models/Team");
+const path = require("path");
 
 app.use(express.json({ extended: true }));
 
