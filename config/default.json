@@ -1,0 +1,5 @@
+{
+  "port": 5000,
+  "mongoUri": "mongodb+srv://poker_user:IOBsep2CGsMp@cluster0-1kwax.azure.mongodb.net/development?retryWrites=true&w=majority",
+  "jwtSecret": "planning-secret"
+}

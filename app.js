@@ -13,7 +13,15 @@ app.use("/api/user", require("./routes/user.routes"));
 app.use("/api/teams", require("./routes/teams.routes"));
 app.use("/api/results", require("./routes/results.routes"));
 
-const PORT = config.get("port") || 5000;
+if (process.env.NODE_ENV === "production") {
+  app.use("/", express.static(path.join(__dirname, "client", "build")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
+
+const PORT = 80;
 
 async function start() {
   try {
