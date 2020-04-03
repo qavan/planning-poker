@@ -1,6 +1,7 @@
 import React from "react";
 import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 import classes from "./Auth.module.sass";
+import { setMessage } from "../../functions";
 
 export default class Auth extends React.Component {
   state = {
@@ -25,28 +26,17 @@ export default class Auth extends React.Component {
         })
       });
       const data = await response.json();
-      if (data.status === 201) {
-        this.setState({
-          message: {
-            type: "success",
-            text: "Пользователь зарегистрирован!"
-          }
-        });
+      if (response.status === 201) {
+        setMessage.call(this, "success", "Пользователь зарегистрирован!");
       } else {
-        this.setState({
-          message: {
-            type: "danger",
-            text: data.message || "Произошла ошибка при регистрации!"
-          }
-        });
+        setMessage.call(
+          this,
+          "danger",
+          data.message || "Произошла ошибка при регистрации!"
+        );
       }
     } catch (error) {
-      this.setState({
-        message: {
-          type: "danger",
-          text: "Произошла ошибка при регистрации!"
-        }
-      });
+      setMessage.call(this, "danger", "Произошла ошибка при регистрации!");
     }
   }
 
@@ -69,27 +59,20 @@ export default class Auth extends React.Component {
       });
       const data = await response.json();
       if (data.token) {
-        console.log(data);
         this.props.onLogin(data.token, data.userId);
       } else {
-        this.setState({
-          message: {
-            type: "danger",
-            text: data.message || "Произошла ошибка при авторизации!"
-          },
-          blocked: false
-        });
+        setMessage.call(
+          this,
+          "danger",
+          data.message || "Произошла ошибка при авторизации!"
+        );
       }
     } catch (error) {
-      console.log(error);
-      this.setState({
-        message: {
-          type: "danger",
-          text: "Произошла ошибка при авторизации!"
-        },
-        blocked: false
-      });
+      setMessage.call(this, "danger", "Произошла ошибка при авторизации!");
     }
+    this.setState({
+      blocked: false
+    });
   }
 
   render() {

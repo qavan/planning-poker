@@ -1,6 +1,7 @@
 import React from "react";
 import { Modal, Form, Button, Alert } from "react-bootstrap";
 import { withRouter } from "react-router-dom";
+import { setMessage } from "../../functions";
 
 class ModalPassword extends React.Component {
   state = {
@@ -25,12 +26,7 @@ class ModalPassword extends React.Component {
     if (response.status === 200) {
       this.props.history.push(`/team/${this.props.teamId}`);
     } else {
-      this.setState({
-        message: {
-          type: "danger",
-          text: data.message
-        }
-      });
+      setMessage.call(this, "danger", data.message);
     }
   };
 

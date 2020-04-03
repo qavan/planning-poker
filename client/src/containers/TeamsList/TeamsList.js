@@ -12,6 +12,7 @@ import { Loader } from "../../components/Loader/Loader";
 import classes from "./TeamsList.module.sass";
 import { NavLink } from "react-router-dom";
 import ModalPassword from "../../components/ModalPassword/ModalPassword";
+import { setLoading, setMessage } from "../../functions";
 
 export default class TeamList extends React.Component {
   state = {
@@ -27,18 +28,12 @@ export default class TeamList extends React.Component {
   async createTeamHandler(event) {
     event.preventDefault();
     if (!this.state.teamName) {
-      this.setState({
-        message: {
-          type: "danger",
-          text: "Имя команды не может быть пустым!"
-        }
-      });
+      setMessage.call(this, "danger", "Имя команды не может быть пустым!");
       return;
     }
     try {
-      this.setState({
-        loading: true
-      });
+      setLoading.call(this, true);
+
       const { teamName, teamPass } = this.state;
       const response = await fetch("/api/teams/create", {
         method: "POST",
@@ -53,39 +48,24 @@ export default class TeamList extends React.Component {
       });
       const data = await response.json();
       if (response.status === 200) {
+        setMessage.call(this, "success", "Команда создана!");
         this.setState({
-          message: {
-            type: "success",
-            text: "Команда создана!"
-          },
           teamName: "",
           teamPass: ""
         });
         this.loadTeams();
       } else {
-        this.setState({
-          message: {
-            type: "danger",
-            text: data.message
-          }
-        });
+        setMessage.call(this, "danger", data.message);
       }
     } catch (error) {
-      this.setState({
-        message: {
-          type: "danger",
-          text: "Произошла ошибка при создании команды!"
-        }
-      });
+      setMessage.call(this, "danger", "Произошла ошибка при создании команды!");
     }
-    this.setState({
-      loading: false
-    });
+    setLoading.call(this, false);
   }
 
   async loadTeams() {
     try {
-      this.setState({ loading: true });
+      setLoading.call(this, true);
 
       const response = await fetch("/api/teams/", {
         method: "GET",
@@ -95,23 +75,14 @@ export default class TeamList extends React.Component {
         }
       });
       const data = await response.json();
-      console.log(data);
       this.setState({
         teams: data.teams,
         loading: false
       });
-      console.log(this.state);
     } catch (error) {
-      this.setState({
-        message: {
-          type: "danger",
-          text: "Произошла ошибка при загрузке команд!"
-        }
-      });
+      setMessage.call(this, "danger", "Произошла ошибка при загрузке команд!");
     }
-    this.setState({
-      loading: false
-    });
+    setLoading.call(this, false);
   }
 
   async componentDidMount() {
@@ -232,9 +203,7 @@ export default class TeamList extends React.Component {
         <Container>
           <Row>
             <Col>
-              <h4 className={`text-center ${classes.title}`}>
-                Создать команду
-              </h4>
+              <h4 className="text-center title">Создать команду</h4>
               {this.state.message ? (
                 <Alert variant={this.state.message.type}>
                   {this.state.message.text}
@@ -284,7 +253,7 @@ export default class TeamList extends React.Component {
                 </Button>
               </Form>
               <hr />
-              <h4 className={`text-center ${classes.title}`}>Список команд</h4>
+              <h4 className="text-center title">Список команд</h4>
               {this.state.loading ? <Loader /> : this.renderTeams()}
             </Col>
           </Row>

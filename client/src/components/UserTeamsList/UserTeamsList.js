@@ -16,7 +16,7 @@ export const UserTeamsList = props => {
           <tbody>
             {props.teamsList.map(team => {
               return (
-                <tr>
+                <tr key={team.teamId}>
                   <td>{team.teamName}</td>
                   <td
                     className={classes.deleteTeam}

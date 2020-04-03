@@ -5,6 +5,9 @@ import TeamsList from "./containers/TeamsList/TeamsList";
 import Settings from "./containers/Settings/Settings";
 import Planning from "./containers/Planning/Planning";
 import { Switch, Route, Redirect } from "react-router-dom";
+import { ResultsList } from "./containers/ResultsList/ResultsList";
+import { Result } from "./containers/Result/Result";
+import "./App.sass";
 
 export default class App extends React.Component {
   state = {
@@ -99,6 +102,29 @@ export default class App extends React.Component {
               <Route path="/" exact>
                 <TeamsList token={this.state.userToken} />
               </Route>
+              <Route
+                path="/results"
+                exact
+                render={matchProps => (
+                  <ResultsList
+                    {...matchProps}
+                    {...this.props}
+                    token={this.state.userToken}
+                  />
+                )}
+              />
+              <Route
+                path="/result/:id"
+                exact
+                render={matchProps => (
+                  <Result
+                    {...matchProps}
+                    {...this.props}
+                    token={this.state.userToken}
+                    userId={this.state.userId}
+                  />
+                )}
+              />
               <Redirect to="/" />
             </Switch>
           </React.Fragment>

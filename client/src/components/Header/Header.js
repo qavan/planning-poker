@@ -15,6 +15,14 @@ const Header = props => {
           <NavLink
             className="nav-link"
             activeClassName="active"
+            to="/results"
+            exact
+          >
+            Результаты
+          </NavLink>
+          <NavLink
+            className="nav-link"
+            activeClassName="active"
             to="/settings"
             exact
           >

@@ -1,9 +1,9 @@
 import React from "react";
 import { Container, Row, Col, Alert } from "react-bootstrap";
 import { Loader } from "../../components/Loader/Loader";
-import classes from "./Settings.module.sass";
 import UserSettings from "../../components/UserSettings/UserSettings";
 import { UserTeamsList } from "../../components/UserTeamsList/UserTeamsList";
+import { setLoading, setMessage } from "../../functions";
 
 export default class Settings extends React.Component {
   state = {
@@ -11,21 +11,6 @@ export default class Settings extends React.Component {
     userName: "",
     message: null,
     userTeams: null
-  };
-
-  setMessage = (type, message) => {
-    this.setState({
-      message: {
-        type,
-        text: message
-      }
-    });
-  };
-
-  setLoading = value => {
-    this.setState({
-      loading: value
-    });
   };
 
   async loadUserSettings() {
@@ -38,14 +23,13 @@ export default class Settings extends React.Component {
         }
       });
       const data = await response.json();
-      console.log(data);
       this.setState({
         loading: false,
         userName: data.result.userName,
         userTeams: data.result.teams
       });
     } catch (error) {
-      this.setMessage("danger", "Произошла ошибка!");
+      setMessage.call(this, "danger", "Произошла ошибка!");
     }
   }
 
@@ -54,7 +38,7 @@ export default class Settings extends React.Component {
   }
 
   async updateUserNameHandler(userName) {
-    this.setLoading(true);
+    setLoading.call(this, true);
 
     try {
       const response = await fetch("/api/user/name", {
@@ -70,20 +54,20 @@ export default class Settings extends React.Component {
       const data = await response.json();
 
       if (response.status === 200) {
-        this.setMessage("success", data.message);
+        setMessage.call(this, "success", data.message);
         await this.loadUserSettings();
       } else {
-        this.setMessage("danger", "Произошла ошибка!");
+        setMessage.call(this, "danger", "Произошла ошибка!");
       }
     } catch (error) {
-      this.setMessage("danger", "Произошла ошибка!");
+      setMessage.call(this, "danger", "Произошла ошибка!");
     }
 
-    this.setLoading(false);
+    setLoading.call(this, false);
   }
 
   async deleteTeam(teamId) {
-    this.setLoading(true);
+    setLoading.call(this, true);
 
     try {
       const response = await fetch("/api/teams/delete", {
@@ -98,14 +82,14 @@ export default class Settings extends React.Component {
       });
       const data = await response.json();
       if (response.status === 200) {
-        this.setMessage("success", data.message);
+        setMessage.call(this, "success", data.message);
       } else {
-        this.setMessage("danger", data.message);
+        setMessage.call(this, "danger", data.message);
       }
     } catch (error) {}
     await this.loadUserSettings();
 
-    this.setLoading(false);
+    setLoading.call(this, false);
   }
 
   render() {
@@ -124,9 +108,7 @@ export default class Settings extends React.Component {
       <Container>
         <Row>
           <Col>
-            <h4 className={`text-center ${classes.title}`}>
-              Настройки пользователя
-            </h4>
+            <h4 className="text-center title">Настройки пользователя</h4>
             {this.state.message ? (
               <Alert variant={this.state.message.type}>
                 {this.state.message.text}
@@ -149,5 +131,5 @@ export default class Settings extends React.Component {
         />
       </Container>
     );
-  } 
+  }
 }
